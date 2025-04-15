@@ -151,8 +151,8 @@ credentials: `user`:`password`
 
 ### 400 Bad Request
 
-Ошибка при вализации dto
-![img_20.png](assets/img_20.png)
+Ошибка при валидации dto
+![img.png](assets/img_20.png)
 
 ### 500 Internal Server Error
 

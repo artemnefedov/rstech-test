@@ -34,7 +34,7 @@ public class ControllerAdvice {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public Map<String, String> handleValidationException(MethodArgumentNotValidException e) {
         return Map.of("error",
-                "Ошибка: "
+                "Валидация: "
                         + e.getBindingResult().getFieldErrors().stream()
                         .map(FieldError::getDefaultMessage)
                         .collect(Collectors.joining(", "))
