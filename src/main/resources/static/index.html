@@ -1,10 +1,152 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
 	<meta charset="UTF-8">
-	<title>Title</title>
+	<title>Каталог</title>
+	<link crossorigin="anonymous"
+	      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css"
+	      integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7"
+	      rel="stylesheet">
+	<script crossorigin="anonymous"
+	        integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq"
+	        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
+	<style>
+		body {
+			background: linear-gradient(to right, #eef2f3, #8e9eab);
+			min-height: 100vh;
+		}
+
+		.filter-block {
+			background-color: white;
+			border-radius: 16px;
+			padding: 1.5rem;
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+		}
+
+		.product-img-thumb {
+			height: 60px;
+			width: 60px;
+			object-fit: cover;
+			border-radius: 8px;
+		}
+
+		.table-products {
+			background-color: white;
+			border-radius: 16px;
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+			overflow: hidden;
+		}
+
+		.table td, .table th {
+			vertical-align: middle;
+		}
+
+	</style>
 </head>
 <body>
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-4">
+	<div class="container">
+		<a class="navbar-brand" href="/">Каталог товаров</a>
+		<div class="collapse navbar-collapse">
+			<ul class="navbar-nav ms-auto gap-2">
+				<li class="nav-item">
+					<a class="nav-link" href="/categories">Категории</a>
+				</li>
+				<li class="nav-item">
+					<button class="btn btn-success" onclick="createProduct()">Создать продукт</button>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link btn" onclick="logout()">Выйти</a>
+				</li>
+			</ul>
+		</div>
+	</div>
+</nav>
+<div class="toast-container position-fixed top-0 end-0 p-3" id="error-container"
+     style="z-index: 1055;"></div>
 
+<div class="container mb-5">
+	<div class="row">
+
+		<div class="col-md-3 mb-4">
+			<form class="filter-block">
+				<h5 class="mb-3">Фильтр</h5>
+				<div class="mb-3">
+					<input class="form-control" id="name" name="name" placeholder="Название" type="text">
+				</div>
+				<div class="mb-3">
+					<select class="form-select" id="category-list" name="categoryName">
+						<option value="">Категория</option>
+					</select>
+				</div>
+				<div class="mb-3">
+					<input class="form-control" id="price-from" name="priceFrom" placeholder="Цена от"
+					       type="number">
+				</div>
+				<div class="mb-3">
+					<input class="form-control" id="price-to" name="priceTo" placeholder="Цена до"
+					       type="number">
+				</div>
+				<div class="d-grid gap-2">
+					<button class="btn btn-primary" onclick="filter()" type="button">Применить</button>
+					<a class="btn btn-outline-secondary" href="/">Сбросить</a>
+				</div>
+			</form>
+		</div>
+
+		<div class="col-md-9">
+			<div class="table-responsive table-products">
+				<table class="table table-hover align-middle mb-0">
+					<thead class="table-light">
+					<tr id="table-header">
+						<th scope="col">Изображение</th>
+						<th scope="col">Название</th>
+						<th scope="col">Описание</th>
+						<th scope="col">Цена</th>
+						<th scope="col">Категория</th>
+						<th scope="col">Статус</th>
+					</tr>
+					</thead>
+					<tbody id="product-list"></tbody>
+				</table>
+			</div>
+			<nav class="mt-4" id="pagination"></nav>
+		</div>
+	</div>
+</div>
+<div aria-hidden="true" aria-labelledby="editProductModalLabel" class="modal fade"
+     id="editProductModal" tabindex="-1">
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="editProductModalLabel">Редактировать продукт</h5>
+				<button aria-label="Закрыть" class="btn-close" data-bs-dismiss="modal"
+				        type="button"></button>
+			</div>
+			<div class="modal-body" id="edit-product-body"></div>
+		</div>
+	</div>
+</div>
+<div aria-hidden="true" aria-labelledby="deleteProductModalLabel" class="modal fade"
+     id="deleteProductModal" tabindex="-1">
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content">
+			<div class="modal-header bg-danger text-white">
+				<h5 class="modal-title" id="deleteProductModalLabel">Удалить товар</h5>
+				<button aria-label="Закрыть" class="btn-close btn-close-white" data-bs-dismiss="modal"
+				        type="button"></button>
+			</div>
+			<div class="modal-body">
+				Вы уверены, что хотите удалить этот товар?
+			</div>
+			<div class="modal-footer">
+				<button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Отмена</button>
+				<button class="btn btn-danger" id="confirm-delete" type="button">Удалить</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script src="js/index.js" type="module"></script>
 </body>
 </html>

@@ -1,22 +1,33 @@
 package io.github.artemnefedov.rstech.service.impl;
 
+import static io.github.artemnefedov.rstech.repository.specs.SearchOperation.EQUAL;
+import static io.github.artemnefedov.rstech.repository.specs.SearchOperation.LIKE;
+
 import io.github.artemnefedov.rstech.dto.ProductDto;
 import io.github.artemnefedov.rstech.entity.Product;
+import io.github.artemnefedov.rstech.repository.CategoryRepository;
 import io.github.artemnefedov.rstech.repository.ProductRepository;
-import io.github.artemnefedov.rstech.repository.specs.ProductSpecification;
+import io.github.artemnefedov.rstech.repository.specs.ProductSpec;
 import io.github.artemnefedov.rstech.repository.specs.SearchCriteria;
 import io.github.artemnefedov.rstech.repository.specs.SearchOperation;
 import io.github.artemnefedov.rstech.service.ProductService;
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
+    private final CategoryRepository categoryRepository;
 
-    public ProductServiceImpl(ProductRepository productRepository) {
+    public ProductServiceImpl(ProductRepository productRepository,
+            CategoryRepository categoryRepository) {
         this.productRepository = productRepository;
+        this.categoryRepository = categoryRepository;
     }
 
     @Override
@@ -44,26 +55,34 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductDto> search(String category, String name, String priceFrom, String priceTo) {
-        ProductSpecification specification = new ProductSpecification();
-
-        if (category != null && !category.isEmpty()) {
-            specification.add(new SearchCriteria("category.name", category, SearchOperation.EQUAL));
-        }
+    public Page<ProductDto> findProducts(String name, String categoryName, BigDecimal priceFrom,
+            BigDecimal priceTo, Pageable pageable) {
+        List<SearchCriteria> criteriaList = new ArrayList<>();
 
         if (name != null && !name.isEmpty()) {
-            specification.add(new SearchCriteria("name", name, SearchOperation.EQUAL));
+            criteriaList.add(new SearchCriteria("name", name, LIKE));
         }
-        if (priceFrom != null && !priceFrom.isEmpty()) {
-            specification.add(new SearchCriteria("price", priceFrom, SearchOperation.GREATER_THAN));
+        if (categoryName != null && !categoryName.isEmpty()) {
+            criteriaList.add(
+                    new SearchCriteria("category", categoryRepository.findByName(categoryName),
+                            EQUAL));
         }
+        if (priceFrom != null) {
+            criteriaList.add(new SearchCriteria("price", priceFrom, SearchOperation.GREATER_THAN));
+        }
+        if (priceTo != null) {
+            criteriaList.add(new SearchCriteria("price", priceTo, SearchOperation.LESS_THAN));
+        }
+        ProductSpec spec = new ProductSpec(criteriaList);
 
-        if (priceTo != null && !priceTo.isEmpty()) {
-            specification.add(new SearchCriteria("price", priceTo, SearchOperation.LESS_THAN));
-        }
+        return productRepository.findAll(spec, pageable).map(Product::toDto);
+    }
 
-        return productRepository.findAll(specification).stream()
-                .map(Product::toDto)
-                .toList();
+    @Override
+    public ProductDto getById(long id) {
+        return productRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Product with id " + id + " does not exist"))
+                .toDto();
     }
 }

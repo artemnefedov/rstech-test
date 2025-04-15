@@ -4,7 +4,6 @@ public record SearchCriteria(
         String key,
         Object value,
         SearchOperation operation
-
 ) {
 
 }

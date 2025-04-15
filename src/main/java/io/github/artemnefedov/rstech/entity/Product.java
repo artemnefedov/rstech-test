@@ -5,6 +5,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
@@ -15,22 +17,34 @@ public class Product {
     private long id;
     private String name;
     private String description;
-    private String price;
+    private BigDecimal price;
     private String imageUrl;
+    @ManyToOne
+    private Category category;
     private LocalDate createdAt;
     private boolean isActive;
 
-    public Product() {
-    }
-
-    public Product(long id, String name, String description, String price, String imageUrl, LocalDate createdAt, boolean isActive) {
+    public Product(long id, String name, String description, BigDecimal price, String imageUrl,
+            Category category, LocalDate createdAt, boolean isActive) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.price = price;
         this.imageUrl = imageUrl;
+        this.category = category;
         this.createdAt = createdAt;
         this.isActive = isActive;
+    }
+
+    public Product() {
+    }
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
     }
 
     public long getId() {
@@ -57,11 +71,11 @@ public class Product {
         this.description = description;
     }
 
-    public String getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(String price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 
@@ -94,9 +108,9 @@ public class Product {
                 id,
                 name,
                 description,
-                price,
+                price.doubleValue(),
                 imageUrl,
-                null, // category is not set in this example
+                category.toDto(),
                 createdAt,
                 isActive
         );
